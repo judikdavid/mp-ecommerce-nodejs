@@ -1,17 +1,14 @@
+require('dotenv').config()
 var express = require('express');
 var exphbs = require('express-handlebars');
 var port = process.env.PORT || 3000
 const mercadopago = require('mercadopago');
-const access_token = 'APP_USR-1159009372558727-072921-8d0b9980c7494985a5abd19fbe921a3d-617633181'
-const integrator_id = 'dev_24c65fb163bf11ea96500242ac130004'
+const { access_token, integrator_id, host, external_reference } = process.env
 
 mercadopago.configure({
     access_token,
     integrator_id,
 });
-
-const host = 'https://e6a6-89-132-231-7.eu.ngrok.io'
-const external_reference = 'gonzalo.egonzalez@gmail.com'
 
 var app = express();
 
