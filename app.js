@@ -1,7 +1,8 @@
 require('dotenv').config()
-var express = require('express');
-var exphbs = require('express-handlebars');
-var port = process.env.PORT || 3000
+const express = require('express');
+const bodyParser = require("body-parser");
+const exphbs = require('express-handlebars');
+const port = process.env.PORT || 3000
 const mercadopago = require('mercadopago');
 const { access_token, integrator_id, host, external_reference } = process.env
 
@@ -10,12 +11,14 @@ mercadopago.configure({
     integrator_id,
 });
 
-var app = express();
+const app = express();
 
 app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
 
 app.use(express.static('assets'));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.use('/assets', express.static(__dirname + '/assets'));
 
@@ -46,7 +49,7 @@ app.get('/detail', function (req, res) {
         "payer": {
             "name": "Lalo",
             "surname": "Landa",
-            "email": "test_user_81131286@testuser.com",
+            "email": "test_user_63274575@testuser.com",
             "phone": {
                 "area_code": "11",
                 "number": 44444444
@@ -64,8 +67,7 @@ app.get('/detail', function (req, res) {
         "payment_methods": {
             "excluded_payment_methods": [
                 {
-                    // TODO: change to visa
-                    "id": "master"
+                    "id": "visa"
                 }
             ],
             "excluded_payment_types": [
@@ -87,9 +89,7 @@ app.get('/detail', function (req, res) {
 
     mercadopago.preferences.create(preference)
         .then(function (response) {
-            console.log(response)
-            // This value replaces the String "<%= global.id %>" in your HTML
-            return res.render('detail', { ...req.query, preference: response.body.id, init_point: response.body.init_point })
+            return res.render('detail', { ...req.query, init_point: response.body.init_point })
         }).catch(function (error) {
             console.log(error);
         });
@@ -107,8 +107,9 @@ app.get('/feedback', function (req, res) {
     });
 });
 
-app.get('/ipn', function (req, res) {
-    console.log(req)
+app.post('/ipn', function (req, res) {
+    console.log(req.body)
+    res.sendStatus(200)
 });
 
 app.listen(port);
